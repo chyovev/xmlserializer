@@ -2,8 +2,12 @@
 
 namespace ChYovev\XMLSerializer;
 
+use ChYovev\XMLSerializer\Traits\Elementable;
+
 class Element
 {
+
+    use Elementable;
 
     /**
      * Each Element should have a tag name which is
@@ -27,18 +31,6 @@ class Element
      * @var string
      */
     protected ?string $value = null;
-
-    /**
-     * Each Element may have subelements, which can
-     * also have subelements of their own, and so on.
-     * Subelements cannot coexist with a value property
-     * at the same time: if subelements are added, the
-     * value property will be ignored.
-     * Field is optional.
-     * 
-     * @var Element[]
-     */
-    protected array $elements = [];
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -73,21 +65,6 @@ class Element
         $this->value = $value;
 
         return $this;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    public function addElement(Element $element): static {
-        $this->elements[] = $element;
-
-        return $this;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /**
-     * @return Element[] 
-     */
-    public function getElements(): array {
-        return $this->elements;
     }
 
 }
