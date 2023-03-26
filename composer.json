@@ -1,0 +1,20 @@
+{
+    "name": "chyovev/xmlserializer",
+    "description": "A PHP library to generate XML documents in a user-friendly way using OOP",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "ChYovev\\XMLSerializer\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Christo Yovev",
+            "email": "yovev@xroads-bg.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    }
+}
