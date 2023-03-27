@@ -2,6 +2,7 @@
 
 namespace ChYovev\XMLSerializer;
 
+use Closure;
 use ChYovev\XMLSerializer\Traits\Elementable;
 
 class Element
@@ -58,6 +59,39 @@ class Element
     ///////////////////////////////////////////////////////////////////////////
     public function getValue(): ?string {
         return $this->value;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * The value mehtod is invoked by the add() method of
+     * the Elementable trait and is meant to either populate
+     * the value property of an Element, or to add sub-elements.
+     * For details, see the add() method annotations.
+     * 
+     * @see    \ChYovev\XMLSerializer\Traits\Elementable :: add()
+     * @param  null|string|callback $value
+     * @return static
+     */
+    public function value(mixed $value = null): static {
+        if ($this->isCallback($value)) {
+            call_user_func($value, $this);
+        }
+        else {
+            $this->setValue($value);
+        }
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Check if the parameter passed to the value()
+     * method is a callback method.
+     * 
+     * @return bool
+     */
+    private function isCallback(mixed $value): bool {
+        return is_a($value, Closure::class);
     }
 
     ///////////////////////////////////////////////////////////////////////////

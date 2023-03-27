@@ -32,7 +32,55 @@ trait Elementable
 
 
     ///////////////////////////////////////////////////////////////////////////
-    public function addElement(Element $element): self {
+    /**
+     * A shortcut method to initiate, populate and add an
+     * Element object to the elements array property.
+     * There are several options for the $value property
+     * which will generate different output during XML
+     * serialization:
+     *     – not providing a value would result in an emtpy tag:
+     * 
+     *       $document->add('book'):
+     * 
+     *           <book/>
+     * 
+     *     – a string would is the standard option:
+     * 
+     *       $document->add('language', 'Bulgarian'):
+     * 
+     *           <language>Bulgarian</language>
+     * 
+     *     – a callback method which accepts the Element
+     *       object being generated as a property – this
+     *       offers maximum flexibility as it allows for
+     *       the Element to be further manipulated,
+     *       including adding sub-elements to it
+     *       (nested callbacks are also supported):
+     * 
+     *       $document->add('book', function(Element $element) {
+     *            $element->add('chapter', 'The boy who lived');
+     *       })
+     * 
+     *           <book>
+     *               <chapter>The boy who lived</title>
+     *           </book>
+     * 
+     * @param  string $tagName
+     * @param  null|string|callback $value
+     * @return static
+     */
+    public function add(string $tagName, mixed $value = null): static {
+        $element = new Element($tagName);
+
+        $element->value($value);
+
+        $this->addElement($element);
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function addElement(Element $element): static {
         $this->elements[] = $element;
 
         return $this;
