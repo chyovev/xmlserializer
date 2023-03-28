@@ -22,6 +22,19 @@ class Element
     protected ?string $tagName = null;
 
     /**
+     * A single Element can have multiple attributes.
+     * Attributes are stored as an associative array
+     * having the name of the attribute as key.
+     * Attribute values are optional, keys are not.
+     * Even though namespaces are also serialized as
+     * attributes, they should be added separately
+     * using the $namespaces property.
+     * 
+     * @var string[] – [key => value]
+     */
+    protected array $attributes = [];
+
+    /**
      * Each Element typically has a value.
      * Elements with no values are also supported.
      * Alternatively, an Element can have a set of
@@ -54,6 +67,48 @@ class Element
         $this->tagName = $tagName;
 
         return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getAttributes(): array {
+        return $this->attributes;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * @param string[] $attributes
+     */
+    public function setAttributes(array $attributes): static {
+        foreach ($attributes as $attribute => $value) {
+            $this->addAttribute($attribute, $value);
+        }
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function addAttribute(string $attribute, string $value): static {
+        $this->attributes[$attribute] = $value;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Shortcut to the setter method.
+     * 
+     * @param string[] $attributes
+     */
+    public function attributes(array $attributes): static {
+        return $this->setAttributes($attributes);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Shortcut to the adder method.
+     */
+    public function attribute(string $attribute, string $value): static {
+        return $this->addAttribute($attribute, $value);
     }
 
     ///////////////////////////////////////////////////////////////////////////
