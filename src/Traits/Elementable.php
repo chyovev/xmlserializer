@@ -123,6 +123,36 @@ trait Elementable
 
     ///////////////////////////////////////////////////////////////////////////
     /**
+     * A chain method to set attributes to an Element.
+     * 
+     * @param string[] $attributes
+     */
+    public function attributes(array $attributes): static {
+        $element = $this->getTempElement();
+
+        $element->setAttributes($attributes);
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * A chain method to set a single attribute to an Element.
+     * 
+     * @param  string $attribute – name of the attribute (required)
+     * @param  string $value     – value of the attribute (can be an empty string)
+     * @return static
+     */
+    public function attribute(string $attribute, string $value): static {
+        $element = $this->getTempElement();
+
+        $element->addAttribute($attribute, $value);
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
      * Every time an Element gets prepared using any of the chain
      * methods, a temporary Element object gets created and passed
      * around using this method. If no such object exists, it gets

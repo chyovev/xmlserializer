@@ -108,24 +108,6 @@ class Element
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /**
-     * Shortcut to the setter method.
-     * 
-     * @param string[] $attributes
-     */
-    public function attributes(array $attributes): static {
-        return $this->setAttributes($attributes);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /**
-     * Shortcut to the adder method.
-     */
-    public function attribute(string $attribute, string $value): static {
-        return $this->addAttribute($attribute, $value);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     public function getValue(): ?string {
         return $this->value;
     }
