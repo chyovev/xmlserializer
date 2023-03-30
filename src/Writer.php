@@ -147,7 +147,9 @@ class Writer
         // passing null as parameter to text() is deprecated,
         // so if the value is null, simply leave it as is
         elseif ( ! is_null($value)) {
-            $this->writer->text($value);
+            $element->isCData()
+                ? $this->writer->writeCData($value)
+                : $this->writer->text($value);
         }
     }
 }

@@ -8,6 +8,12 @@ use ChYovev\XMLSerializer\Element;
  * Since both Document & Element classes can have
  * (sub)elements, they both share this common trait
  * which allows them to manage these (sub)elements. 
+ * The construction of a single Element can be executed
+ * via method chaining (such as marking its contents
+ * as character data via the cdata() method), but
+ * the last method from the chain should always be
+ * the add() one which specifies the name of the
+ * tag-to-be-serialized.
  */
 
 trait Elementable
@@ -30,11 +36,24 @@ trait Elementable
      */
     protected array $elements = [];
 
+    /**
+     * Every time an Element gets added to the $elements
+     * property using the shortcut method, a temporary
+     * instance gets created which allows for it to be
+     * manipulated by the chain methods, without using
+     * a callback method.
+     * 
+     * @var Element
+     */
+    private Element $tempElement;
+
 
     ///////////////////////////////////////////////////////////////////////////
     /**
      * A shortcut method to initiate, populate and add an
      * Element object to the elements array property.
+     * This method should always be called last during
+     * method chaining.
      * There are several options for the $value property
      * which will generate different output during XML
      * serialization:
@@ -70,13 +89,55 @@ trait Elementable
      * @return static
      */
     public function add(string $tagName, mixed $value = null): static {
-        $element = new Element($tagName);
+        $element = $this->getTempElement();
 
-        $element->value($value);
+        $element
+            ->setTagName($tagName)
+            ->value($value);
 
         $this->addElement($element);
 
+        // unset the temp element so it can be recreated for the
+        // next element being added via one of the chain methods
+        unset($this->tempElement);
+
         return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * The cdata() method is meant to be used as a chain
+     * method which marks an Element as a character data
+     * in order for its contents not to be escaped during
+     * serialization.
+     * 
+     * @return static
+     */
+    public function cdata(): static {
+        $element = $this->getTempElement();
+
+        $element->markAsCData();
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Every time an Element gets prepared using any of the chain
+     * methods, a temporary Element object gets created and passed
+     * around using this method. If no such object exists, it gets
+     * instantiated by the first chain method in line.
+     * The last chain method is always the add() one which appends
+     * the temporary Element to the set, and then unsets it.
+     * 
+     * @return Element
+     */
+    private function getTempElement(): Element {
+        if ( ! isset($this->tempElement)) {
+            $this->tempElement = new Element();
+        }
+
+        return $this->tempElement;
     }
 
     ///////////////////////////////////////////////////////////////////////////

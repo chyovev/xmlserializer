@@ -46,6 +46,20 @@ class Element
      */
     protected ?string $value = null;
 
+    /**
+     * By default special characters (such as HTML tags)
+     * in an Element's contents/value are automatically
+     * escaped during XML serialization to avoid them
+     * from being interpreted as XML markup.
+     * In order for an HTML string not to be escaped,
+     * it should be marked as "character data" or CData
+     * by setting the $isCData property to true.
+     * This will wrap the value in a <![CDATA[  ]]> section.
+     * 
+     * @var bool
+     */
+    protected bool $isCData = false;
+
 
     ///////////////////////////////////////////////////////////////////////////
     /**
@@ -152,6 +166,23 @@ class Element
     ///////////////////////////////////////////////////////////////////////////
     public function setValue(string $value = null): static {
         $this->value = $value;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function isCData(): bool {
+        return $this->isCData;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function markAsCData(): static {
+        return $this->setCData(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setCData(bool $flag): static {
+        $this->isCData = $flag;
 
         return $this;
     }
