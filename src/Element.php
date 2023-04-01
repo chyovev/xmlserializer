@@ -72,6 +72,15 @@ class Element
      */
     protected ?string $comment = null;
 
+    /**
+     * Same as the $comment property, but
+     * is serialized above the Element.
+     * Field is optional.
+     * 
+     * @var string
+     */
+    protected ?string $preComment = null;
+
 
     ///////////////////////////////////////////////////////////////////////////
     /**
@@ -189,6 +198,18 @@ class Element
     ///////////////////////////////////////////////////////////////////////////
     public function setComment(string $comment): static {
         $this->comment = $comment;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getPreComment(): ?string {
+        return $this->preComment;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setPreComment(string $preComment): static {
+        $this->preComment = $preComment;
 
         return $this;
     }

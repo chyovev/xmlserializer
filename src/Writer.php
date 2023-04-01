@@ -91,6 +91,8 @@ class Writer
      * @return void
      */
     protected function serializeElement(Element $element): void {
+        $this->serializePreComment($element);
+
         $tagName = $element->getTagName();
         $this->writer->startElement($tagName);
 
@@ -99,6 +101,25 @@ class Writer
         $this->serializeElementContents($element);
 
         $this->writer->endElement();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Serialize an Element's pre-comment (if any) after proper sanitation.
+     * In comparison to the regular comment, the pre-comment is written
+     * before the opening tag of the element.
+     * 
+     * @param  Element $element
+     * @return void 
+     */
+    protected function serializePreComment(Element $element): void {
+        $preComment = $element->getPreComment();
+
+        if ( ! is_null($preComment)) {
+            $this->sanitizeComment($preComment);
+
+            $this->writer->writeComment($preComment);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

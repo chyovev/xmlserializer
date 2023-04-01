@@ -127,12 +127,32 @@ trait Elementable
      * method – it would add a comment string at the top
      * of the Element being serialized.
      * 
+     * @param  string $preComment
      * @return static
      */
     public function comment(string $comment): static {
         $element = $this->getTempElement();
 
         $element->setComment($comment);
+        
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Much like the comment() chain method, the preComment()
+     * method is used to add a comment string for an Element,
+     * the only difference between the two being the location
+     * of the comment: with preComment() the comment is
+     * serialized before the opening tag of the element.
+     * 
+     * @param  string $preComment
+     * @return static
+     */
+    public function preComment(string $preComment): static {
+        $element = $this->getTempElement();
+
+        $element->setPreComment($preComment);
         
         return $this;
     }
