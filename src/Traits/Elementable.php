@@ -123,6 +123,22 @@ trait Elementable
 
     ///////////////////////////////////////////////////////////////////////////
     /**
+     * The comment() method is meant to be used as a chain
+     * method – it would add a comment string at the top
+     * of the Element being serialized.
+     * 
+     * @return static
+     */
+    public function comment(string $comment): static {
+        $element = $this->getTempElement();
+
+        $element->setComment($comment);
+        
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
      * A chain method to set attributes to an Element.
      * 
      * @param string[] $attributes

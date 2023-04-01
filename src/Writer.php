@@ -93,11 +93,50 @@ class Writer
     protected function serializeElement(Element $element): void {
         $tagName = $element->getTagName();
         $this->writer->startElement($tagName);
-            
+
+        $this->serializeComment($element);
         $this->serializeElementAttributes($element);
         $this->serializeElementContents($element);
 
         $this->writer->endElement();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Serialize an Element's comment (if any) after proper sanitation.
+     * 
+     * @param  Element $element
+     * @return void 
+     */
+    protected function serializeComment(Element $element): void {
+        $comment = $element->getComment();
+
+        if ( ! is_null($comment)) {
+            $this->sanitizeComment($comment);
+
+            $this->writer->writeComment($comment);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Comments are not allowed to contain two or more
+     * consecutive dashes as this would make the XML
+     * document invalid. Consecutive dashes are escaped
+     * by putting a backslash inbetween.
+     * 
+     * @param  string &$comment – passed by reference
+     * @return void
+     */
+    private function sanitizeComment(string &$comment): void {
+        while (preg_match('/-{2,}/', $comment)) {
+            $comment = str_replace('--', '-\-', $comment);
+        }
+
+        // trailing dashes should also be escaped since they'd
+        // form consecutive dashes with the comment's closing
+        // tag (which is -->) 
+        $comment = preg_replace('/-$/', '-\\', $comment);
     }
 
     ///////////////////////////////////////////////////////////////////////////

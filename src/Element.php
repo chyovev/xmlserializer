@@ -60,6 +60,18 @@ class Element
      */
     protected bool $isCData = false;
 
+    /**
+     * A comment string which is put at the top of the
+     * element being serialized.
+     * Comments should not contain two consecutive dashes
+     * as this would cause XML validation to fail.
+     * If set, they will be escaped during serialization.
+     * Field is optional.
+     * 
+     * @var string
+     */
+    protected ?string $comment = null;
+
 
     ///////////////////////////////////////////////////////////////////////////
     /**
@@ -165,6 +177,18 @@ class Element
     ///////////////////////////////////////////////////////////////////////////
     public function setCData(bool $flag): static {
         $this->isCData = $flag;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getComment(): ?string {
+        return $this->comment;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setComment(string $comment): static {
+        $this->comment = $comment;
 
         return $this;
     }
