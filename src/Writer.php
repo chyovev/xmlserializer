@@ -32,17 +32,36 @@ class Writer
      */
     protected XMLWriter $writer;
 
+    /**
+     * The namespace helper is used to figure out
+     * whether and which namespace and prefix to use
+     * for an element which is marked to belong to a
+     * certain namespace.
+     * Gets set in constructor.
+     * 
+     * @var NamespaceHelper
+     */
+    protected NamespaceHelper $namespaceHelper;
+
 
     ///////////////////////////////////////////////////////////////////////////
     public function __construct(Document $document) {
         $this->document = $document;
 
         $this->setWriter();
+        $this->setNamespaceHelper();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     protected function setWriter(): void {
         $this->writer = new XMLWriter();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    protected function setNamespaceHelper(): void {
+        $rootNamespaces = $this->document->getNamespaces();
+        
+        $this->namespaceHelper = new NamespaceHelper($rootNamespaces);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -93,8 +112,17 @@ class Writer
     protected function serializeElement(Element $element): void {
         $this->serializePreComment($element);
 
+        // figure out which namespace and prefix to use
+        // for the element being serialized
+        $this->namespaceHelper->route($element);
+        $tagPrefix    = $this->namespaceHelper->getPrefix();
+        $tagNamespace = $this->namespaceHelper->getNamespace();
+
+        // always use startElementNs to open a tag,
+        // even if the element has no namespace:
+        // null values are not serialized anyway
         $tagName = $element->getTagName();
-        $this->writer->startElement($tagName);
+        $this->writer->startElementNs($tagPrefix, $tagName, $tagNamespace);
 
         $this->serializeComment($element);
         $this->serializeElementAttributes($element);
@@ -168,10 +196,10 @@ class Writer
      * @return void
      */
     protected function serializeElementAttributes(Element $element): void {
-        // root elements should have the global Document
+        // root elements should have the Document
         // namespaces serialized as attributes
         if ($element->isRoot()) {
-            $this->serializeGlobalNamespaces();
+            $this->serializeRootNamespaces();
         }
 
         foreach ($element->getAttributes() as $attribute => $value) {
@@ -181,10 +209,10 @@ class Writer
 
     ///////////////////////////////////////////////////////////////////////////
     /**
-     * All global document namespaces should be serialized
+     * All root document namespaces should be serialized
      * as attributes of the root elements.
      */
-    protected function serializeGlobalNamespaces(): void {
+    protected function serializeRootNamespaces(): void {
         $namespaces = $this->document->getNamespaces();
 
         foreach ($namespaces as $uri => $prefix) {
@@ -196,7 +224,7 @@ class Writer
 
     ///////////////////////////////////////////////////////////////////////////
     /**
-     * The prefixes of the global namespace attributes should be
+     * The prefixes of the root namespace attributes should be
      * preceeded by a prefix of their own – xlmns.
      * Default namespaces applying to all elements in a document
      * have no prefixes, but the xlmns part should remain.

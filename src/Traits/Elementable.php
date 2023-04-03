@@ -190,6 +190,23 @@ trait Elementable
 
     ///////////////////////////////////////////////////////////////////////////
     /**
+     * A chain method to set a namespace and a prefix for the Element.
+     * 
+     * @see    \ChYovev\XMLSerializer\Element :: setNamespace()
+     * @param  string $uri    – namespace URI, required
+     * @param  string $prefix – namespace prefix, optional
+     * @return static 
+     */
+    public function namespace(string $uri, string $prefix = null): static {
+        $element = $this->getTempElement();
+
+        $element->setNamespace($uri, $prefix);
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
      * Every time an Element gets prepared using any of the chain
      * methods, a temporary Element object gets created and passed
      * around using this method. If no such object exists, it gets

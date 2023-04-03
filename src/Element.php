@@ -35,13 +35,26 @@ class Element
     protected array $attributes = [];
 
     /**
+     * Each element can belong to a certain namespace;
+     * usually namespaces are associated with a prefix
+     * for the serialized tag name.
+     * Fields are optional.
+     * 
+     * @see self :: setNamespace()
+     * @see \ChYovev\XMLSerializer\NamespaceHelper
+     * @var string
+     */
+    protected ?string $namespaceUri    = null;
+    protected ?string $namespacePrefix = null;
+
+    /**
      * All elements which are direct ascendents
      * of the Document object (normally it should
      * be just one) are considered root elements.
-     * Root elements should have the global
+     * Root elements should have the document
      * namespaces declared as attributes.
      * 
-     * @see \ChYovev\XMLSerializer\Writer :: serializeGlobalNamespaces()
+     * @see \ChYovev\XMLSerializer\Writer :: serializeRootNamespaces()
      * @var bool
      */
     protected bool $isRoot = false;
@@ -136,6 +149,55 @@ class Element
     ///////////////////////////////////////////////////////////////////////////
     public function addAttribute(string $attribute, string $value): static {
         $this->attributes[$attribute] = $value;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function hasNamespace(): bool {
+        return isset($this->namespaceUri);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getNamespaceUri(): ?string {
+        return $this->namespaceUri;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setNamespaceUri(string $namespaceUri): static {
+        $this->namespaceUri = $namespaceUri;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getNamespacePrefix(): ?string {
+        return $this->namespacePrefix;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setNamespacePrefix(string $namespacePrefix): static {
+        $this->namespacePrefix = $namespacePrefix;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Depending on whether the namespace is pre-declared as a root
+     * namespace, the Element namespace URI and prefix may be
+     * serialized differently.
+     * 
+     * @see \ChYovev\XMLSerializer\NamespaceHelper
+     * @param string $uri    – namespace URI, required
+     * @param string $prefix – namespace prefix, optional
+     */
+    public function setNamespace(string $uri, string $prefix = null): static {
+        $this->setNamespaceUri($uri);
+
+        if ( ! is_null($prefix)) {
+            $this->setNamespacePrefix($prefix);
+        }
 
         return $this;
     }
