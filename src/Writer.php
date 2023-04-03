@@ -168,9 +168,49 @@ class Writer
      * @return void
      */
     protected function serializeElementAttributes(Element $element): void {
+        // root elements should have the global Document
+        // namespaces serialized as attributes
+        if ($element->isRoot()) {
+            $this->serializeGlobalNamespaces();
+        }
+
         foreach ($element->getAttributes() as $attribute => $value) {
             $this->serializeElementAttribute($attribute, $value);
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * All global document namespaces should be serialized
+     * as attributes of the root elements.
+     */
+    protected function serializeGlobalNamespaces(): void {
+        $namespaces = $this->document->getNamespaces();
+
+        foreach ($namespaces as $uri => $prefix) {
+            $attribute = $this->getAttributeForNamespace($prefix);
+
+            $this->serializeElementAttribute($attribute, $uri);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * The prefixes of the global namespace attributes should be
+     * preceeded by a prefix of their own – xlmns.
+     * Default namespaces applying to all elements in a document
+     * have no prefixes, but the xlmns part should remain.
+     * 
+     * @param string $prefix
+     */
+    protected function getAttributeForNamespace(string $prefix = null): string {
+        $attribute = "xmlns";
+
+        if ($prefix !== '') {
+            $attribute .= ":{$prefix}";
+        }
+
+        return $attribute;
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -35,6 +35,18 @@ class Element
     protected array $attributes = [];
 
     /**
+     * All elements which are direct ascendents
+     * of the Document object (normally it should
+     * be just one) are considered root elements.
+     * Root elements should have the global
+     * namespaces declared as attributes.
+     * 
+     * @see \ChYovev\XMLSerializer\Writer :: serializeGlobalNamespaces()
+     * @var bool
+     */
+    protected bool $isRoot = false;
+
+    /**
      * Each Element typically has a value.
      * Elements with no values are also supported.
      * Alternatively, an Element can have a set of
@@ -124,6 +136,23 @@ class Element
     ///////////////////////////////////////////////////////////////////////////
     public function addAttribute(string $attribute, string $value): static {
         $this->attributes[$attribute] = $value;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function isRoot(): bool {
+        return $this->isRoot;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function markAsRoot(): static {
+        return $this->setIsRoot(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setIsRoot(bool $flag): static {
+        $this->isRoot = $flag;
 
         return $this;
     }

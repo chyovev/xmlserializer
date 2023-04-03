@@ -2,6 +2,7 @@
 
 namespace ChYovev\XMLSerializer\Traits;
 
+use ChYovev\XMLSerializer\Document;
 use ChYovev\XMLSerializer\Element;
 
 /**
@@ -201,6 +202,12 @@ trait Elementable
     private function getTempElement(): Element {
         if ( ! isset($this->tempElement)) {
             $this->tempElement = new Element();
+
+            // if the parent of the tempElement is a Document,
+            // the element is considered a root element
+            if ($this instanceof Document) {
+                $this->tempElement->markAsRoot();
+            }
         }
 
         return $this->tempElement;
