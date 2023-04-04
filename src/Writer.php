@@ -74,7 +74,15 @@ class Writer
      */
     public function generateXML(): string {
         $this->writer->openMemory();
-        $this->writer->startDocument();
+
+        // if an XML prolog should be generated (default = true),
+        // use the XML version and encoding from the Document object
+        if ($this->document->useProlog()) {
+            $this->writer->startDocument(
+                $this->document->getXmlVersion(),
+                $this->document->getEncoding()
+            );
+        }
 
         // use 4 spaces for indentation
         $this->writer->setIndent(true);
@@ -83,7 +91,9 @@ class Writer
         $elements = $this->document->getElements();
         $this->serializeElements($elements);
 
-        $this->writer->endDocument();
+        if ($this->document->useProlog()) {
+            $this->writer->endDocument();
+        }
 
         return $this->writer->outputMemory();
     }
