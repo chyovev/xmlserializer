@@ -80,13 +80,15 @@ class Writer
         if ($this->document->useProlog()) {
             $this->writer->startDocument(
                 $this->document->getXmlVersion(),
-                $this->document->getEncoding()
+                $this->document->getEncoding(),
+                $this->document->getStandAloneString()
             );
         }
 
-        // use 4 spaces for indentation
-        $this->writer->setIndent(true);
-        $this->writer->setIndentString('    ');
+        // what indentation to use (and whether),
+        // default is 4 white spaces
+        $this->writer->setIndent($this->document->useIndent());
+        $this->writer->setIndentString($this->document->getIndentString());
 
         $elements = $this->document->getElements();
         $this->serializeElements($elements);

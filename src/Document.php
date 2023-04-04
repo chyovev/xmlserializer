@@ -29,6 +29,15 @@ class Document
     protected ?string $encoding = null;
 
     /**
+     * Whether the XML document should depend on
+     * an external (DTD) markup declaration.
+     * DTD stands for Document type definition.
+     * 
+     * @var bool
+     */
+    protected ?bool $standAlone = null;
+
+    /**
      * By default all XML documents have a prolog
      * (i.e. an opening tag <?xml ?>).
      * Using the skipProlog() method one can choose
@@ -37,6 +46,27 @@ class Document
      * @var bool
      */
     protected bool $useProlog = true;
+
+    /**
+     * Whether to indent nested elements.
+     * Default is true.
+     * Can be disabled either by using setIndent(false)
+     * or a shortcut method: noIndent().
+     * 
+     * @var bool
+     */
+    protected bool $useIndent = true;
+
+    /**
+     * What type of indentation to use for
+     * nested elements when $useIndent = true.
+     * Default value is 4 white spaces, but it
+     * can be changed to a tab (\t), a dot (.),
+     * two dots (..) or whatever.
+     * 
+     * @var string
+     */
+    protected string $indentString = '    ';
 
     /**
      * All namespaces used in the XML document;
@@ -88,6 +118,43 @@ class Document
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /**
+     * The standalone property used in the XML prolog
+     * accepts only a yes/no value. If the property is
+     * not set (null value), the standalone attribute
+     * will not be generated in the prolog.
+     */
+    public function getStandAloneString(): ?string {
+        if (is_null($this->standAlone)) {
+            return null;
+        }
+
+        return $this->standAlone ? 'yes' : 'no';
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getStandAlone(): ?bool {
+        return $this->standAlone;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function markAsStandAlone(): static {
+        return $this->setStandAlone(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function markAsNotStandAlone(): static {
+        return $this->setStandAlone(false);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setStandAlone(bool $flag): static {
+        $this->standAlone = $flag;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     public function useProlog(): bool {
         return $this->useProlog;
     }
@@ -100,6 +167,52 @@ class Document
     ///////////////////////////////////////////////////////////////////////////
     public function setUseProlog(bool $flag): static {
         $this->useProlog = $flag;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function useIndent(): bool {
+        return $this->useIndent;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function noIndent(): static {
+        return $this->setIndent(false);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * The setIndent() method can be used to manipulate
+     * both the $useIndent and $indentString properties.
+     * 
+     * Eg.:
+     *     setIndent(false) – don't use indentation
+     *     setIndent("\t")  – use a tab character for indentation
+     * 
+     * @param bool|string $value
+     */
+    public function setIndent(mixed $value): static {
+        if (is_bool($value)) {
+            $this->useIndent = $value;
+        }
+        else {
+            $this->useIndent = true;
+
+            $this->setIndentString($value);
+        }
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getIndentString(): string {
+        return $this->indentString;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setIndentString(string $indentString): static {
+        $this->indentString = $indentString;
 
         return $this;
     }
