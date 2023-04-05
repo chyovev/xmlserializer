@@ -3,6 +3,8 @@
 namespace ChYovev\XMLSerializer;
 
 use Closure;
+use UnexpectedValueException;
+use ChYovev\XMLSerializer\Interfaces\XmlSerializable;
 use ChYovev\XMLSerializer\Traits\Elementable;
 
 class Element
@@ -232,12 +234,19 @@ class Element
      * For details, see the add() method annotations.
      * 
      * @see    \ChYovev\XMLSerializer\Traits\Elementable :: add()
-     * @param  null|string|callback $value
+     * @throws UnexpectedValueException – value is object, but it is not serializable
+     * @param  null|string|callback|XmlSerializable $value
      * @return static
      */
     public function value(mixed $value = null): static {
         if ($this->isCallback($value)) {
             call_user_func($value, $this);
+        }
+        elseif ($this->isSerializable($value)) {
+            $value->xmlSerialize($this);
+        }
+        elseif (is_object($value)) {
+            throw new UnexpectedValueException(sprintf("Object %s passed as Element value does not implement the XmlSerializable interface", get_class($value)));
         }
         else {
             $this->setValue($value);
@@ -255,6 +264,19 @@ class Element
      */
     private function isCallback(mixed $value): bool {
         return is_a($value, Closure::class);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Check whether the parameter passed to the value()
+     * method is an XmlSerializable object, i.e. it implements
+     * the xmlSerialize() method in order to add sub-elements
+     * to an element.
+     * 
+     * @return bool
+     */
+    private function isSerializable(mixed $value): bool {
+        return is_a($value, XmlSerializable::class);
     }
 
     ///////////////////////////////////////////////////////////////////////////

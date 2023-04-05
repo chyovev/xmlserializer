@@ -2,8 +2,10 @@
 
 namespace ChYovev\XMLSerializer\Traits;
 
+use UnexpectedValueException;
 use ChYovev\XMLSerializer\Document;
 use ChYovev\XMLSerializer\Element;
+use ChYovev\XMLSerializer\Interfaces\XmlSerializable;
 
 /**
  * Since both Document & Element classes can have
@@ -85,8 +87,29 @@ trait Elementable
      *               <chapter>The boy who lived</title>
      *           </book>
      * 
+     *     – an XmlSerializable object which is supposed to
+     *       add sub-elements to an element; to achieve this,
+     *       the object implements the xmlSerialize() method
+     *       which accepts the parent element as a parameter;
+     *       from then on one can invoke the same add() method
+     *       on the parent element which can accept yet another
+     *       XmlSerializable object and so on.
+     *       By design XmlSerializable objects are responsible
+     *       for populating only their inner elements:
+     * 
+     *       class Chapter implements XmlSerializable {
+     *           public function xmlSerialize(Element $parent): void {
+     *               $parent->add('title', 'The boy who lived');
+     *           }
+     *       }
+     * 
+     *       $chapter = new Chapter();
+     * 
+     *       $document->add('chapter', $chapter);
+     * 
      * @param  string $tagName
-     * @param  null|string|callback $value
+     * @throws UnexpectedValueException – unserializable object passed as value
+     * @param  null|string|callback|XmlSerializable $value
      * @return static
      */
     public function add(string $tagName, mixed $value = null): static {
