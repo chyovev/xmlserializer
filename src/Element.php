@@ -228,7 +228,7 @@ class Element
 
     ///////////////////////////////////////////////////////////////////////////
     /**
-     * The value mehtod is invoked by the add() method of
+     * The parseValue() mehtod is invoked by the add() method of
      * the Elementable trait and is meant to either populate
      * the value property of an Element, or to add sub-elements.
      * For details, see the add() method annotations.
@@ -238,7 +238,7 @@ class Element
      * @param  null|string|callback|XmlSerializable $value
      * @return static
      */
-    public function value(mixed $value = null): static {
+    public function parseValue(mixed $value = null): static {
         if ($this->isCallback($value)) {
             call_user_func($value, $this);
         }
@@ -257,7 +257,7 @@ class Element
 
     ///////////////////////////////////////////////////////////////////////////
     /**
-     * Check if the parameter passed to the value()
+     * Check if the parameter passed to the parseValue()
      * method is a callback method.
      * 
      * @return bool
@@ -268,7 +268,7 @@ class Element
 
     ///////////////////////////////////////////////////////////////////////////
     /**
-     * Check whether the parameter passed to the value()
+     * Check whether the parameter passed to the parseValue()
      * method is an XmlSerializable object, i.e. it implements
      * the xmlSerialize() method in order to add sub-elements
      * to an element.

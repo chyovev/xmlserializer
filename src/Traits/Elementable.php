@@ -40,11 +40,14 @@ trait Elementable
     protected array $elements = [];
 
     /**
-     * Every time an Element gets added to the $elements
-     * property using the shortcut method, a temporary
-     * instance gets created which allows for it to be
-     * manipulated by the chain methods, without using
-     * a callback method.
+     * Sub-elements are added to the $elements property
+     * with the help of chain methods. Each of these
+     * chain methods passes around a $tempElement object
+     * (instantiating it beforehand if needed), updating
+     * different properties.
+     * Finally, the add() method sets the tag name and
+     * value (if needed) of the Element, appends it
+     * to the $elements array and unsets the $tempElement.
      * 
      * @var Element
      */
@@ -56,7 +59,7 @@ trait Elementable
      * A shortcut method to initiate, populate and add an
      * Element object to the elements array property.
      * This method should always be called last during
-     * method chaining.
+     * method chaining, hence the void return type.
      * There are several options for the $value property
      * which will generate different output during XML
      * serialization:
@@ -66,7 +69,7 @@ trait Elementable
      * 
      *           <book/>
      * 
-     *     – a string would is the standard option:
+     *     – a string is the standard option:
      * 
      *       $document->add('language', 'Bulgarian'):
      * 
@@ -110,22 +113,20 @@ trait Elementable
      * @param  string $tagName
      * @throws UnexpectedValueException – unserializable object passed as value
      * @param  null|string|callback|XmlSerializable $value
-     * @return static
+     * @return void
      */
-    public function add(string $tagName, mixed $value = null): static {
+    public function add(string $tagName, mixed $value = null): void {
         $element = $this->getTempElement();
 
         $element
             ->setTagName($tagName)
-            ->value($value);
+            ->parseValue($value);
 
         $this->addElement($element);
 
         // unset the temp element so it can be recreated for the
         // next element being added via one of the chain methods
         unset($this->tempElement);
-
-        return $this;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -254,7 +255,11 @@ trait Elementable
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    public function addElement(Element $element): static {
+    /**
+     * New elements are meant to be added by the public add() method
+     * which calls this protected method.
+     */
+    protected function addElement(Element $element): static {
         $this->elements[] = $element;
 
         return $this;

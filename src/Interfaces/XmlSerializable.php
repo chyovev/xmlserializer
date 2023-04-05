@@ -14,7 +14,7 @@ use ChYovev\XMLSerializer\Element;
  * Objects implementing the XmlSerializable interface
  * should have the xmlSerialize() method declared.
  * 
- * @see \ChYovev\XMLSerializer\Element :: value()
+ * @see \ChYovev\XMLSerializer\Element :: parseValue()
  */
 
 interface XmlSerializable
