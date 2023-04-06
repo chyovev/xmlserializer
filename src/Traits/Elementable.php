@@ -244,6 +244,10 @@ trait Elementable
         if ( ! isset($this->tempElement)) {
             $this->tempElement = new Element();
 
+            // all elements, no matter the sub-level,
+            // should be associated with the Document object
+            $this->tempElement->setDocument($this->getDocument());
+
             // if the parent of the tempElement is a Document,
             // the element is considered a root element
             if ($this instanceof Document) {

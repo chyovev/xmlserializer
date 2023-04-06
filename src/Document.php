@@ -85,6 +85,18 @@ class Document
      */
     protected array $namespaces = [];
 
+    /**
+     * Sometimes it may be useful for a Document
+     * to pass a "global variable" to all elements,
+     * no matter in which sub-level they reside.
+     * Since the Document object itself can be
+     * accessed using the getDocument() method,
+     * one can use the getGlobalVars() method on it.
+     * 
+     * @var array
+     */
+    protected array $globalVars = [];
+
 
     ///////////////////////////////////////////////////////////////////////////
     public function __construct(string $encoding = null) {
@@ -240,6 +252,34 @@ class Document
     public function addNamespace(string $uri, string $prefix): static {
         $this->namespaces[$uri] = $prefix;
 
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getGlobalVars(): array {
+        return $this->globalVars;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setGlobalVars(array $globalVars): static {
+        $this->globalVars = $globalVars;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function addGlobalVar(string $key, mixed $value): static {
+        $this->globalVars[$key] = $value;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Pass self in order for the document to be associated
+     * with all elements and sub-elements.
+     */
+    public function getDocument(): static {
         return $this;
     }
 

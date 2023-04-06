@@ -108,6 +108,18 @@ class Element
      */
     protected ?string $preComment = null;
 
+    /**
+     * Which document the Element belongs to.
+     * The document object, including its
+     * global variables, can be accessed at
+     * all times in all sub-levels using the
+     * getter method.
+     * 
+     * @see \ChYovev\XMLSerializer\Document :: $globalVars
+     * @var Document
+     */
+    protected Document $document;
+
 
     ///////////////////////////////////////////////////////////////////////////
     /**
@@ -323,6 +335,18 @@ class Element
     ///////////////////////////////////////////////////////////////////////////
     public function setPreComment(string $preComment): static {
         $this->preComment = $preComment;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function getDocument(): Document {
+        return $this->document;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setDocument(Document $document) {
+        $this->document = $document;
 
         return $this;
     }
