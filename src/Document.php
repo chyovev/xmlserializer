@@ -81,6 +81,7 @@ class Document
      * 
      * Field is optional.
      * 
+     * @see \ChYovev\XMLSerializer\NamespaceHelper
      * @var array  
      */
     protected array $namespaces = [];
@@ -235,12 +236,7 @@ class Document
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /**
-     * @param string[] $namespaces
-     */
-    public function setNamespaces(array $namespaces): static {
-        $this->namespaces = [];
-
+    public function addNamespaces(array $namespaces): static {
         foreach ($namespaces as $uri => $prefix) {
             $this->addNamespace($uri, $prefix);
         }
@@ -253,6 +249,15 @@ class Document
         $this->namespaces[$uri] = $prefix;
 
         return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Set a default namespace for the whole Document.
+     * Default namespaces have no prefix (hence the empty string).
+     */
+    public function setNamespace(string $uri): static {
+        return $this->addNamespace($uri, '');
     }
 
     ///////////////////////////////////////////////////////////////////////////
