@@ -74,6 +74,24 @@ class Element
     protected ?string $value = null;
 
     /**
+     * By default Element values and attributes
+     * are serialized the way they are passed to
+     * the XMLWriter, i.e. untrimmed.
+     * Trimming can be turned on for a single
+     * Element by the trimValues() method.
+     * Alternatively, it can also be turned on
+     * globally to apply to all elements by the
+     * trimValues() method invoked on the Document
+     * object. From then on, a single Element can
+     * be excluded from trimming using the Element's 
+     * noTrimValues() method.
+     * 
+     * @see \ChYovev\XMLSerializer\Writer :: shouldTrimValues()
+     * @var bool
+     */
+    protected ?bool $trimValues = null;
+
+    /**
      * By default special characters (such as HTML tags)
      * in an Element's contents/value are automatically
      * escaped during XML serialization to avoid them
@@ -295,6 +313,37 @@ class Element
     public function setValue(string $value = null): static {
         $this->value = $value;
 
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function shouldTrimValues(): ?bool {
+        return $this->trimValues;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Mark a single Element for value and attribute trimming.
+     */
+    public function trimValues(): static {
+        return $this->setTrimValues(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * To be used only if value trimming is set globally
+     * for the whole Document object.
+     * 
+     * @see \ChYovev\XMLSerializer\Document :: trimValues()
+     */
+    public function noTrimValues(): static {
+        return $this->setTrimValues(false);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setTrimValues(bool $flag): static {
+        $this->trimValues = $flag;
+        
         return $this;
     }
 

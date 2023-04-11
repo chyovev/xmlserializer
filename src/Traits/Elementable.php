@@ -231,6 +231,42 @@ trait Elementable
 
     ///////////////////////////////////////////////////////////////////////////
     /**
+     * A chain method to mark the Element's value and attributes
+     * for trimming during serialization.
+     * Alternatively, one can use the trimValues() method on the
+     * Document object; in this case trimming would apply to all
+     * Elements.
+     * 
+     * @see self :: noTrim()
+     * @return static
+     */
+    public function trim(): static {
+        $element = $this->getTempElement();
+
+        $element->trimValues();
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * If a Document has been marked for trimming using the trimValues()
+     * method on it, a single Element can be excluded from trimming by
+     * using the noTrim() chain method.
+     * 
+     * @see \ChYovev\XMLSerializer\Writer :: shouldTrimValues()
+     * @return static
+     */
+    public function noTrim(): static {
+        $element = $this->getTempElement();
+
+        $element->noTrimValues();
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
      * Every time an Element gets prepared using any of the chain
      * methods, a temporary Element object gets created and passed
      * around using this method. If no such object exists, it gets

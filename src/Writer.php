@@ -215,6 +215,10 @@ class Writer
         }
 
         foreach ($element->getAttributes() as $attribute => $value) {
+            if ($this->shouldTrimValues($element)) {
+                $this->trim($value);
+            }
+            
             $this->serializeElementAttribute($attribute, $value);
         }
     }
@@ -287,9 +291,60 @@ class Writer
         // passing null as parameter to text() is deprecated,
         // so if the value is null, simply leave it as is
         elseif ( ! is_null($value)) {
+            if ($this->shouldTrimValues($element)) {
+                $this->trim($value);
+            }
+
             $element->isCData()
                 ? $this->writer->writeCData($value)
                 : $this->writer->text($value);
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * By default Element values and attributes are not
+     * trimmed during serialization.
+     * Trimming can be turned on individually per Element,
+     * or per Document in order to apply to all elements.
+     * If trimming is turned on globally, it can be switched
+     * off for a single Element; hence, using the $trimValues
+     * flag on Elements has a higher priority.
+     * 
+     * @param  Element $element
+     * @return bool
+     */
+    protected function shouldTrimValues(Element $element): bool {
+        if ($element->shouldTrimValues()) {
+            return true;
+        }
+        // default Element value is null, hence the strict comparison
+        elseif ($element->shouldTrimValues() === false) {
+            return false;
+        }
+
+        // if the Element's $trimValues property has not been modified
+        // it would remain null – in that case use the Document's flag
+        // globally 
+        return $this->document->shouldTrimValues();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Trim a string by stripping all white spaces
+     * before and after the string.
+     * 
+     * @param  string $string – trimmable string passed by reference
+     * @return void
+     */
+    protected function trim(string &$string): void {
+        // regex breakdown:
+        //     1. any number of white spaces
+        //     2. any string of characters (including white spaces)
+        //        but not ending on a sequence of white spaces
+        //     3. any number of white spaces
+        $pattern = '/^\s*(.*[^\s])\s*$/';
+        $string  = preg_replace($pattern, '$1', $string);
+    }
+
 }

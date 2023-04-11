@@ -98,6 +98,24 @@ class Document
      */
     protected array $globalVars = [];
 
+    /**
+     * By default Element values and attributes
+     * are serialized the way they are passed to
+     * the XMLWriter, i.e. untrimmed.
+     * Trimming can be turned on for a single
+     * Element by the trimValues() method.
+     * Alternatively, it can also be turned on
+     * globally to apply to all elements by the
+     * trimValues() method invoked on the Document
+     * object. From then on, a single Element can
+     * be excluded from trimming using the Element's 
+     * noTrimValues() method.
+     * 
+     * @see \ChYovev\XMLSerializer\Writer :: shouldTrimValues()
+     * @var bool
+     */
+    protected bool $trimValues = false;
+
 
     ///////////////////////////////////////////////////////////////////////////
     public function __construct(string $encoding = null) {
@@ -276,6 +294,23 @@ class Document
     public function addGlobalVar(string $key, mixed $value): static {
         $this->globalVars[$key] = $value;
 
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function shouldTrimValues(): bool {
+        return $this->trimValues;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function trimValues(): static {
+        return $this->setTrimValues(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setTrimValues(bool $flag): static {
+        $this->trimValues = $flag;
+        
         return $this;
     }
 
