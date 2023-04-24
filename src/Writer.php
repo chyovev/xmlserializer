@@ -215,6 +215,10 @@ class Writer
         }
 
         foreach ($element->getAttributes() as $attribute => $value) {
+            if ($this->shouldSkipAttribute($element, $value)) {
+                continue;
+            }
+
             if ($this->shouldTrimValues($element)) {
                 $this->trim($value);
             }
@@ -255,6 +259,40 @@ class Writer
         }
 
         return $attribute;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Attributes with empty values may be skipped from serialization
+     * if such a setting was set globally for the whole document
+     * or for the respective element being serialized.
+     * 
+     * NB! Even though element namespaces are de facto serialized as
+     *     attributes, this check does *not* apply to them since
+     *     namespaces serve a different purpose.
+     * 
+     * @param  Element $element – element being serialized
+     * @param  string  $value   – attribute's value being serialized
+     * @return bool
+     */
+    protected function shouldSkipAttribute(Element $element, string $value): bool {
+        // if the attribute value is not empty, don't skip it
+        if (trim($value) !== '') {
+            return false;
+        }
+
+        if ($element->shouldSkipEmptyAttributes()) {
+            return true;
+        }
+        // default Element value is null, hence the strict comparison
+        elseif ($element->shouldSkipEmptyAttributes() === false) {
+            return false;
+        }
+
+        // if the Element's $skipEmptyAttributes property has not been
+        // modified it would remain null – in that case use the Document's
+        // flag globally 
+        return $this->document->shouldSkipEmptyAttributes();
     }
 
     ///////////////////////////////////////////////////////////////////////////

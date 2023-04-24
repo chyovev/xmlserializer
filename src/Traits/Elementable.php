@@ -214,6 +214,43 @@ trait Elementable
 
     ///////////////////////////////////////////////////////////////////////////
     /**
+     * If a Document has been marked for skipping attributes with
+     * empty values using the skipEmptyAttributes() method on it,
+     * a single Element's attributes can be excluded from skipping
+     * by using the allowEmptyAttributes() chain method.
+     * 
+     * @see \ChYovev\XMLSerializer\Writer :: shouldSkipAttribute()
+     * @return static
+     */
+    public function allowEmptyAttributes(): static {
+        $element = $this->getTempElement();
+
+        $element->noSkipEmptyAttributes();
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * A chain method to mark the Element's empty attributes for
+     * skipping during serialization.
+     * Alternatively, one can use the skipEmptyAttributes() method
+     * on the Document object; in this case skipping would apply to
+     * all Elements' empty attributes.
+     * 
+     * @see self :: allowEmptyAttributes()
+     * @return static
+     */
+    public function noEmptyAttributes(): static {
+        $element = $this->getTempElement();
+
+        $element->skipEmptyAttributes();
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
      * A chain method to set a namespace and a prefix for the Element.
      * 
      * @see    \ChYovev\XMLSerializer\Element :: setNamespace()

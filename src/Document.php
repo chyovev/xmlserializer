@@ -116,6 +116,23 @@ class Document
      */
     protected bool $trimValues = false;
 
+    /**
+     * By default Element attributes are always
+     * serialized, even if they have empty values,
+     * unless the skipEmptyAttributes() method is
+     * called on that element.
+     * Alternatively, it can also be turned on
+     * globally to apply to all elements via the
+     * skipEmptyAttributes() method invoked on the
+     * Document object. From then on, a single
+     * Element can be excluded from this rule
+     * by calling the noSkipEmptyAttributes() method.
+     * 
+     * @see \ChYovev\XMLSerializer\Writer :: shouldSkipAttribute()
+     * @var bool
+     */
+    protected bool $skipEmptyAttributes = false;
+
 
     ///////////////////////////////////////////////////////////////////////////
     public function __construct(string $encoding = null) {
@@ -311,6 +328,23 @@ class Document
     public function setTrimValues(bool $flag): static {
         $this->trimValues = $flag;
         
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function shouldSkipEmptyAttributes(): bool {
+        return $this->skipEmptyAttributes;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function skipEmptyAttributes(): static {
+        return $this->setSkipEmptyAttributes(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setSkipEmptyAttributes(bool $flag): static {
+        $this->skipEmptyAttributes = $flag;
+
         return $this;
     }
 

@@ -92,6 +92,23 @@ class Element
     protected ?bool $trimValues = null;
 
     /**
+     * By default Element attributes are always
+     * serialized, even if they have empty values,
+     * unless the skipEmptyAttributes() method is
+     * called on that element.
+     * Alternatively, it can also be turned on
+     * globally to apply to all elements via the
+     * skipEmptyAttributes() method invoked on the
+     * Document object. From then on, a single
+     * Element can be excluded from this rule
+     * by calling the noSkipEmptyAttributes() method.
+     * 
+     * @see \ChYovev\XMLSerializer\Writer :: shouldSkipAttribute()
+     * @var bool
+     */
+    protected ?bool $skipEmptyAttributes = null;
+
+    /**
      * By default special characters (such as HTML tags)
      * in an Element's contents/value are automatically
      * escaped during XML serialization to avoid them
@@ -343,6 +360,43 @@ class Element
     ///////////////////////////////////////////////////////////////////////////
     public function setTrimValues(bool $flag): static {
         $this->trimValues = $flag;
+        
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function shouldSkipEmptyAttributes(): ?bool {
+        return $this->skipEmptyAttributes;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Mark a single Element for empty attribute skipping.
+     * Usually called by the respective chain method declared
+     * in the Elementable trait.
+     * 
+     * @see \ChYovev\XMLSerializer\Traits\Elementable :: noEmptyAttributes()
+     */
+    public function skipEmptyAttributes(): static {
+        return $this->setSkipEmptyAttributes(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * To be used only if empty attribute skipping is set
+     * globally for the whole Document object, usually called
+     * by the respective chain method declared in the Elementable trait.
+     * 
+     * @see \ChYovev\XMLSerializer\Traits\Elementable :: allowEmptyAttributes()
+     * @see \ChYovev\XMLSerializer\Document :: skipEmptyAttributes()
+     */
+    public function noSkipEmptyAttributes(): static {
+        return $this->setSkipEmptyAttributes(false);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setSkipEmptyAttributes(bool $flag): static {
+        $this->skipEmptyAttributes = $flag;
         
         return $this;
     }
