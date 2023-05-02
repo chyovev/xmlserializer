@@ -133,6 +133,20 @@ class Document
      */
     protected bool $skipEmptyAttributes = false;
 
+    /**
+     * By default, Elements with no/empty values will
+     * still be serialized as empty tags, e.g.: <book />
+     * unless $skipEmptyTags is set to true.
+     * A single Element can then be excluded from this
+     * global rule by calling the allowEmptyTag()
+     * method on it. Alternatively, a single Element
+     * can be skipped from serialization individually
+     * by calling the skipTagIfEmpty() method on it.
+     * 
+     * @var bool
+     */
+    protected bool $skipEmptyTags = false;
+
 
     ///////////////////////////////////////////////////////////////////////////
     public function __construct(string $encoding = null) {
@@ -344,6 +358,23 @@ class Document
     ///////////////////////////////////////////////////////////////////////////
     public function setSkipEmptyAttributes(bool $flag): static {
         $this->skipEmptyAttributes = $flag;
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function shouldSkipEmptyTags(): bool {
+        return $this->skipEmptyTags;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function skipEmptyTags(): static {
+        return $this->setSkipEmptyTags(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setSkipEmptyTags(bool $flag): static {
+        $this->skipEmptyTags = $flag;
 
         return $this;
     }

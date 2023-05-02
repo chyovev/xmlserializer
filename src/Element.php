@@ -109,6 +109,20 @@ class Element
     protected ?bool $skipEmptyAttributes = null;
 
     /**
+     * By default, Elements with no/empty value will
+     * still be serialized as empty tags, e.g.: <book />
+     * unless $skipTagIfEmpty is set to true.
+     * Alternatively, empty tags can be skipped globally
+     * by invoking the skipEmptyTags() method on the
+     * Document object. From then on, a single Element
+     * can be excluded from skipping by calling the
+     * allowEmptyTag() method on the Element.
+     * 
+     * @var bool
+     */
+    protected ?bool $skipTagIfEmpty = null;
+
+    /**
      * By default special characters (such as HTML tags)
      * in an Element's contents/value are automatically
      * escaped during XML serialization to avoid them
@@ -398,6 +412,38 @@ class Element
     public function setSkipEmptyAttributes(bool $flag): static {
         $this->skipEmptyAttributes = $flag;
         
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function shouldSkipIfEmpty(): ?bool {
+        return $this->skipTagIfEmpty;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function skipTagIfEmpty(): static {
+        return $this->setSkipTagIfEmpty(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Exclude an element from empty-tag skipping. To be used
+     * only if empty-tag skipping is turned on globally for the
+     * whole Document.
+     * Current method is usually called by the chain method
+     * declared in the Elementable trait.
+     * 
+     * @see \ChYovev\XMLSerializer\Traits\Elementable :: noSkipIfEmpty()
+     * @see \ChYovev\XMLSerializer\Document :: skipEmptyTags()
+     */
+    public function allowEmptyTag(): static {
+        return $this->setSkipTagIfEmpty(false);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    public function setSkipTagIfEmpty(bool $flag): static {
+        $this->skipTagIfEmpty = $flag;
+
         return $this;
     }
 

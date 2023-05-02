@@ -103,15 +103,82 @@ class Writer
     ///////////////////////////////////////////////////////////////////////////
     /**
      * Cycle through an array of Element objects and
-     * serialize each of them individually.
+     * serialize the ones which are excluded from skipping.
+     * If even one Element gets serialized, return true;
+     * otherwise use false – this way, if the Element has
+     * also a fallback $value set to it, the serializer
+     * will use it instead.
      * 
+     * @see self :: serializeElementContents()
      * @param  Element[]
-     * @return void
+     * @return bool
      */
-    protected function serializeElements(array $elements): void {
+    protected function serializeElements(array $elements): bool {
+        $hasSerialized = false;
+
         foreach ($elements as $item) {
+            if ($this->shouldSkipElement($item)) {
+                continue;
+            }
+
             $this->serializeElement($item);
+
+            $hasSerialized = true;
         }
+
+        return $hasSerialized;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Empty tags should be skipped from serialization
+     * if the Document's $skipEmptyTags is set to true
+     * and neither the Element nor its sub-elements are
+     * excluded from this rule.
+     * Alternatively, if an empty Element is individually
+     * marked for skipping by the $skipTagIfEmpty flag,
+     * then it should be skipped from serialization.
+     * 
+     * @return bool
+     */
+    protected function shouldSkipElement(Element $element): bool {
+        $subelements = $element->getElements();
+
+        // call the method on all sub-elements recursively:
+        // if a single sub-element, no matter the depth, should
+        // not be skipped, then neither should be the current Element
+        foreach ($subelements as $item) {
+            if ( ! $this->shouldSkipElement($item)) {
+                return false;
+            }
+        }
+
+        // if there are no sub-elements or all of them are marked
+        // for skipping, check the value of the current Element
+        $value = $element->getValue();
+
+        // if the Element's value is not empty,
+        // then the Element should not be skipped
+        if ($value && trim($value) !== '') {
+            return false;
+        }
+
+        // if the value is empty, and skipping setting
+        // is turned on for this single element, skip it
+        if ($element->shouldSkipIfEmpty()) {
+            return true;
+        }
+        // if the value is empty and the skipping setting is explicitly
+        // turned off for this element, don't skip the Element
+        // (default Element value is null, hence the strict comparison)
+        elseif ($element->shouldSkipIfEmpty() === false) {
+            return false;
+        }
+
+        // finally, check the Document's setting:
+        // by this point the current Element is definitely empty,
+        // so if empty tags should be skipped, then simply skip it
+        return $this->document->shouldSkipEmptyTags();
     }
 
     ///////////////////////////////////////////////////////////////////////////

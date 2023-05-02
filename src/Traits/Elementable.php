@@ -251,6 +251,44 @@ trait Elementable
 
     ///////////////////////////////////////////////////////////////////////////
     /**
+     * A chain method to mark a single element for skipping
+     * during serialization in case its value is null or an
+     * empty string.
+     * Alternatively, one can turn on empty-tag skipping globally
+     * by invoking the skipEmptyTags() method on the Document
+     * object. From then on, a single Element can be excluded
+     * from skipping via the allowEmptyTag() method called on it.
+     * 
+     * @see self :: noSkipIfEmpty()
+     * @return static
+     */
+    public function skipIfEmpty(): static {
+        $element = $this->getTempElement();
+
+        $element->skipTagIfEmpty();
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * If a Document has been marked for skipping empty tags
+     * using the skipEmptyTags() method on it, a single Element
+     * can be excluded from skipping by using the noSkipIfEmpty()
+     * chain method.
+     * 
+     * @return static
+     */
+    public function noSkipIfEmpty(): static {
+        $element = $this->getTempElement();
+        
+        $element->allowEmptyTag();
+
+        return $this;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
      * A chain method to set a namespace and a prefix for the Element.
      * 
      * @see    \ChYovev\XMLSerializer\Element :: setNamespace()
