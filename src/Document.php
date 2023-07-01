@@ -399,15 +399,43 @@ class Document
 
     ///////////////////////////////////////////////////////////////////////////
     /**
+     * Convert all elements to an XML string and save it to file.
+     * 
+     * @param string $filePath
+     * @return false|int – false on failure; number of bytes written to file on success
+     */
+    public function saveXML(string $filePath): mixed {
+        $xml = $this->generateXML();
+
+        return file_put_contents($filePath, $xml);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
      * Generate an XML from current Document object and its
      * Elements and subelements using a Writer object.
      * 
      * @return string
      */
     public function generateXML(): string {
-        $writer = new Writer($this);
+        $writer = $this->initWriter();
 
         return $writer->generateXML();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    protected function initWriter(): Writer {
+        return new Writer($this);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * Converting the object to a string should simply generate it to XML.
+     * 
+     * @return string
+     */
+    public function __toString() {
+        return $this->generateXML();
     }
 
 }
