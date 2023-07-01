@@ -137,7 +137,7 @@ class Writer
      * excluded from this rule.
      * Alternatively, if an empty Element is individually
      * marked for skipping by the $skipTagIfEmpty flag,
-     * then it should be skipped from serialization.
+     * it should still be skipped from serialization.
      * 
      * @return bool
      */
@@ -199,7 +199,8 @@ class Writer
 
         // always use startElementNs to open a tag,
         // even if the element has no namespace:
-        // null values are not serialized anyway
+        // null values for prefix and namespace
+        // are not serialized anyway
         $tagName = $element->getTagName();
         $this->writer->startElementNs($tagPrefix, $tagName, $tagNamespace);
 
@@ -332,7 +333,7 @@ class Writer
     /**
      * Attributes with empty values may be skipped from serialization
      * if such a setting was set globally for the whole document
-     * or for the respective element being serialized.
+     * or individually for the respective element being serialized.
      * 
      * NB! Even though element namespaces are de facto serialized as
      *     attributes, this check does *not* apply to them since
@@ -359,7 +360,7 @@ class Writer
         // if the Element's $skipEmptyAttributes property has not been
         // modified it would remain null – in that case use the Document's
         // flag globally 
-        return $this->document->shouldSkipEmptyAttributes();
+        return $this->document->shouldSkipEmptyAttributesOfTags();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -379,9 +380,11 @@ class Writer
     ///////////////////////////////////////////////////////////////////////////
     /**
      * An Element's contents contain either a textual value or
-     * a set of subelements which are serialized recursively,
-     * but it should never have both at the same time.
-     * Even if both are set, the subelements have a higher priority.
+     * a set of sub-elements which are serialized recursively.
+     * If both are set, the sub-elements have a higher priority,
+     * but if the skipping empty tags setting is turned on
+     * and no sub-elements are serialized, then the method
+     * might give the value property a try. 
      * 
      * @param  Element $element
      * @return void 
@@ -390,8 +393,10 @@ class Writer
         $subelements = $element->getElements();
         $value       = $element->getValue();
 
-        if ($subelements) {
-            $this->serializeElements($subelements);
+        // if any sub-elements were serialized, exit the method;
+        // if not, try to serialize a value (if not null)
+        if ($this->serializeElements($subelements)) {
+            return;
         }
         // passing null as parameter to text() is deprecated,
         // so if the value is null, simply leave it as is

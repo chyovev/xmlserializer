@@ -5,7 +5,8 @@ namespace ChYovev\XMLSerializer;
 /**
  * The NamespaceHelper class is used to figure out
  * which namespace and prefix to use for an Element
- * during XML serialization:
+ * during XML serialization (that is, in case the
+ * Element has actually been assigned to a namespace):
  *     – if the namespace URI of the Element being
  *       subject to serialization is pre-declared
  *       as a root namespace (which in turn is
@@ -16,6 +17,9 @@ namespace ChYovev\XMLSerializer;
  *       as a root namespace (i.e. it's custom), both
  *       the prefix and the namespace (as an attribute)
  *       will be serialized for that element;
+ *       consecutive elements belonging to the same
+ *       namespace will always have the initial prefix,
+ *       even if they try to overwrite it;
  *     – if the Element namespace is not pre-declared
  *       and no prefix is passed for that namespace,
  *       a prefix will be automatically generated
@@ -109,12 +113,11 @@ class NamespaceHelper
 
         $elementUri = $element->getNamespaceUri();
 
-        if ($this->isNamespaceDeclared($elementUri)) {
-            $this->useExistingNamespace($elementUri);
-        }
-        else {
+        if ( ! $this->isNamespaceDeclared($elementUri)) {
             $this->declareNewNamespace($element);
         }
+
+        $this->setNamespaceAndPrefix($elementUri);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -150,7 +153,7 @@ class NamespaceHelper
      * 
      * @param string $namespace – namespace of an element
      */
-    protected function useExistingNamespace(string $namespace): void {
+    protected function setNamespaceAndPrefix(string $namespace): void {
         $prefix = $this->allNamespaces[$namespace];
 
         $this->setPrefix($prefix);
@@ -214,9 +217,6 @@ class NamespaceHelper
         $prefix    = $element->getNamespacePrefix() ?: $this->generatePrefix();
 
         $this->addNamespace($namespace, $prefix);
-
-        $this->setPrefix($prefix);
-        $this->setNamespace($namespace);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -227,6 +227,8 @@ class NamespaceHelper
      * by a counter which signifies how many custom prefix-less
      * namespaces were generated for the XML document: the first
      * one will be ns1, the second ns2, an so on.
+     * 
+     * @return string
      */
     protected function generatePrefix(): string {
         $this->namespaceCounter++;
@@ -239,6 +241,10 @@ class NamespaceHelper
      * Add a custom non-root namespace to the $allNamespaces array.
      * Future elements belonging to the same namespace will use the
      * prefix specified here.
+     * 
+     * @param  string $uri
+     * @param  string $prefix
+     * @return void
      */
     protected function addNamespace(string $uri, string $prefix): void {
         $this->allNamespaces[$uri] = $prefix;

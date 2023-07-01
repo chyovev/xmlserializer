@@ -16,7 +16,7 @@ class Element
      * Each Element should have a tag name which is
      * used during the XML serialization.
      * Tag names are case-sensitive and cannot
-     * contain spaces.
+     * contain spaces or special characters.
      * Field is required.
      * 
      * @var string
@@ -30,9 +30,10 @@ class Element
      * Attribute values are optional, keys are not.
      * Even though namespaces are also serialized as
      * attributes, they should be added separately
-     * using the $namespaces property.
+     * using the namespace properties below.
+     * Field is optional.
      * 
-     * @var string[] – [key => value]
+     * @var array<string, string> – [key => value]
      */
     protected array $attributes = [];
 
@@ -51,11 +52,15 @@ class Element
 
     /**
      * All elements which are direct ascendents
-     * of the Document object (normally it should
-     * be just one) are considered root elements.
+     * of the Document object are considered root
+     * elements.
      * Root elements should have the document
      * namespaces declared as attributes.
+     * Normally there's just one root element.
+     * The property is set automatically by the
+     * getTempElement() trait method.
      * 
+     * @see \ChYovev\XMLSerializer\Traits\Elementable :: getTempElement()
      * @see \ChYovev\XMLSerializer\Writer :: serializeRootNamespaces()
      * @var bool
      */
@@ -94,11 +99,11 @@ class Element
     /**
      * By default Element attributes are always
      * serialized, even if they have empty values,
-     * unless the skipEmptyAttributes() method is
+     * unless the noEmptyAttributes() method is
      * called on that element.
      * Alternatively, it can also be turned on
      * globally to apply to all elements via the
-     * skipEmptyAttributes() method invoked on the
+     * noEmptyAttributes() method invoked on the
      * Document object. From then on, a single
      * Element can be excluded from this rule
      * by calling the noSkipEmptyAttributes() method.
@@ -321,6 +326,7 @@ class Element
      * Check if the parameter passed to the parseValue()
      * method is a callback method.
      * 
+     * @param  mixed $value
      * @return bool
      */
     private function isCallback(mixed $value): bool {
@@ -334,6 +340,7 @@ class Element
      * the xmlSerialize() method in order to add sub-elements
      * to an element.
      * 
+     * @param  mixed $value
      * @return bool
      */
     private function isSerializable(mixed $value): bool {
@@ -389,9 +396,9 @@ class Element
      * Usually called by the respective chain method declared
      * in the Elementable trait.
      * 
-     * @see \ChYovev\XMLSerializer\Traits\Elementable :: noEmptyAttributes()
+     * @see \ChYovev\XMLSerializer\Traits\Elementable :: skipEmptyAttributes()
      */
-    public function skipEmptyAttributes(): static {
+    public function noEmptyAttributes(): static {
         return $this->setSkipEmptyAttributes(true);
     }
 
@@ -401,10 +408,10 @@ class Element
      * globally for the whole Document object, usually called
      * by the respective chain method declared in the Elementable trait.
      * 
-     * @see \ChYovev\XMLSerializer\Traits\Elementable :: allowEmptyAttributes()
-     * @see \ChYovev\XMLSerializer\Document :: skipEmptyAttributes()
+     * @see \ChYovev\XMLSerializer\Traits\Elementable :: noSkipEmptyAttributes()
+     * @see \ChYovev\XMLSerializer\Document :: noEmptyAttributes()
      */
-    public function noSkipEmptyAttributes(): static {
+    public function allowEmptyAttributes(): static {
         return $this->setSkipEmptyAttributes(false);
     }
 

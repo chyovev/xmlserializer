@@ -215,17 +215,17 @@ trait Elementable
     ///////////////////////////////////////////////////////////////////////////
     /**
      * If a Document has been marked for skipping attributes with
-     * empty values using the skipEmptyAttributes() method on it,
+     * empty values using the noEmptyAttributes() method on it,
      * a single Element's attributes can be excluded from skipping
-     * by using the allowEmptyAttributes() chain method.
+     * by using the noSkipEmptyAttributes() chain method.
      * 
      * @see \ChYovev\XMLSerializer\Writer :: shouldSkipAttribute()
      * @return static
      */
-    public function allowEmptyAttributes(): static {
+    public function noSkipEmptyAttributes(): static {
         $element = $this->getTempElement();
 
-        $element->noSkipEmptyAttributes();
+        $element->allowEmptyAttributes();
 
         return $this;
     }
@@ -238,13 +238,13 @@ trait Elementable
      * on the Document object; in this case skipping would apply to
      * all Elements' empty attributes.
      * 
-     * @see self :: allowEmptyAttributes()
+     * @see self :: noSkipEmptyAttributes()
      * @return static
      */
-    public function noEmptyAttributes(): static {
+    public function skipEmptyAttributes(): static {
         $element = $this->getTempElement();
 
-        $element->skipEmptyAttributes();
+        $element->noEmptyAttributes();
 
         return $this;
     }

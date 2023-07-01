@@ -12,7 +12,7 @@ class Document
     /**
      * The version number of the generated XML document.
      * If no value is provided, 1.0 will be used by default.
-     * Used only when $useProlog = true.
+     * Used only when $useProlog = true (default).
      * 
      * @var string
      */
@@ -20,7 +20,7 @@ class Document
 
     /**
      * The encoding of the generated XML document.
-     * Used only when $useProlog = true.
+     * Used only when $useProlog = true (default).
      * Gets set either in the constructor,
      * or via a public setter.
      * 
@@ -82,7 +82,7 @@ class Document
      * Field is optional.
      * 
      * @see \ChYovev\XMLSerializer\NamespaceHelper
-     * @var array  
+     * @var array<string, string>
      */
     protected array $namespaces = [];
 
@@ -92,9 +92,11 @@ class Document
      * no matter in which sub-level they reside.
      * Since the Document object itself can be
      * accessed using the getDocument() method,
-     * one can use the getGlobalVars() method on it.
+     * one can use the getGlobalVar($var) method to
+     * retrieve a single global variable or
+     * getGlobalVars() to retrieve all.
      * 
-     * @var array
+     * @var array<string, mixed>
      */
     protected array $globalVars = [];
 
@@ -117,32 +119,32 @@ class Document
     protected bool $trimValues = false;
 
     /**
-     * By default Element attributes are always
-     * serialized, even if they have empty values,
-     * unless the skipEmptyAttributes() method is
-     * called on that element.
-     * Alternatively, it can also be turned on
-     * globally to apply to all elements via the
-     * skipEmptyAttributes() method invoked on the
-     * Document object. From then on, a single
-     * Element can be excluded from this rule
-     * by calling the noSkipEmptyAttributes() method.
+     * By default, Element attributes will be serialized
+     * even if they have empty values, unless the Document's
+     * $skipEmptyAttributesOfTags is set to true.
+     * A single Element can then be excluded from this
+     * global empty-attribute skipping rule by calling
+     * the allowEmptyAttributes() method on it.
+     * Alternatively, a single Element can have its empty
+     * attributes skipped from serialization individually
+     * by calling the noEmptyAttributes() method on it.
      * 
      * @see \ChYovev\XMLSerializer\Writer :: shouldSkipAttribute()
      * @var bool
      */
-    protected bool $skipEmptyAttributes = false;
+    protected bool $skipEmptyAttributesOfTags = false;
 
     /**
-     * By default, Elements with no/empty values will
-     * still be serialized as empty tags, e.g.: <book />
-     * unless $skipEmptyTags is set to true.
+     * Elements with no/empty values will be serialized
+     * as empty tags by default, e.g.: <book />,
+     * unless the Document's $skipEmptyTags is set to true.
      * A single Element can then be excluded from this
      * global rule by calling the allowEmptyTag()
      * method on it. Alternatively, a single Element
      * can be skipped from serialization individually
      * by calling the skipTagIfEmpty() method on it.
      * 
+     * @see \ChYovev\XMLSerializer\Writer :: shouldSkipElement()
      * @var bool
      */
     protected bool $skipEmptyTags = false;
@@ -310,6 +312,11 @@ class Document
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    public function getGlobalVar(string $var): mixed {
+        return $this->globalVars[$var] ?? null;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     public function getGlobalVars(): array {
         return $this->globalVars;
     }
@@ -346,18 +353,18 @@ class Document
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    public function shouldSkipEmptyAttributes(): bool {
-        return $this->skipEmptyAttributes;
+    public function shouldSkipEmptyAttributesOfTags(): bool {
+        return $this->skipEmptyAttributesOfTags;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    public function skipEmptyAttributes(): static {
-        return $this->setSkipEmptyAttributes(true);
+    public function skipEmptyAttributesOfTags(): static {
+        return $this->setSkipEmptyAttributesOfTags(true);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    public function setSkipEmptyAttributes(bool $flag): static {
-        $this->skipEmptyAttributes = $flag;
+    public function setSkipEmptyAttributesOfTags(bool $flag): static {
+        $this->skipEmptyAttributesOfTags = $flag;
 
         return $this;
     }
@@ -383,6 +390,8 @@ class Document
     /**
      * Pass self in order for the document to be associated
      * with all elements and sub-elements.
+     * 
+     * @return static
      */
     public function getDocument(): static {
         return $this;
