@@ -8,6 +8,11 @@
             "ChYovev\\XMLSerializer\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "ChYovev\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Christo Yovev",
@@ -16,5 +21,8 @@
     ],
     "require": {
         "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.2"
     }
 }
