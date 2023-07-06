@@ -212,7 +212,7 @@ class Document
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    public function setStandAlone(bool $flag): static {
+    public function setStandAlone(?bool $flag): static {
         $this->standAlone = $flag;
 
         return $this;
